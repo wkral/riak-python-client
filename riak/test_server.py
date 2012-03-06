@@ -103,12 +103,33 @@ class TestServer:
             self.vm_args = deep_merge(self.vm_args, vm_args)
 
         self.app_config = self.APP_CONFIG_DEFAULTS.copy()
+        self.set_backend_config()
         for key, value in options.items():
             if key in self.app_config:
                 self.app_config[key] = deep_merge(self.app_config[key], value)
 
         self.app_config["riak_core"]["ring_state_dir"] = os.path.join(self.temp_dir, "data", "ring")
         self.app_config["riak_core"]["platform_data_dir"] = self.temp_dir
+
+    def read_base_dir(self):
+        with open(os.path.join(self.bin_dir, "riak"), "r") as riak_file:
+            for line in riak_file:
+                m = re.search('^RUNNER_BASE_DIR=(.*)')
+                if m:
+                    self.base_dir = m.group(1)
+                    return
+
+    def read_version(self):
+        self.read_base_dir()
+        version_path = os.path.join(self.base_dir, 'releases/start_erl.data')
+        with open(version_path) as versions:
+            self.version = versions.read().split(' ')[1]
+
+    def set_backend_config(self):
+        self.read_version()
+        if self.version < '1.0.0':
+            backend = Atom('riak_kv_test_014_backend')
+            self.app_config['riak_kv']['storage_backend'] = backend
 
     def prepare(self):
         if not self._prepared:
