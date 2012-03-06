@@ -114,7 +114,7 @@ class TestServer:
     def read_base_dir(self):
         with open(os.path.join(self.bin_dir, "riak"), "r") as riak_file:
             for line in riak_file:
-                m = re.search('^RUNNER_BASE_DIR=(.*)')
+                m = re.search('^RUNNER_BASE_DIR=(.*)', line)
                 if m:
                     self.base_dir = m.group(1)
                     return
