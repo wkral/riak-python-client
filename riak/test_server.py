@@ -128,7 +128,7 @@ class TestServer:
     def set_backend_config(self):
         self.read_version()
         if self.version < '1.0.0':
-            backend = Atom('riak_kv_test_014_backend')
+            backend = Atom('riak_kv_test014_backend')
             self.app_config['riak_kv']['storage_backend'] = backend
 
     def prepare(self):
